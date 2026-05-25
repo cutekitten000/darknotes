@@ -1,0 +1,35 @@
+@if (noteStore.isLoading()) {
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (_ of [1, 2, 3, 4, 5, 6]; track $index) {
+      <div class="bg-surface-2 border border-border rounded-[4px] p-4 animate-pulse">
+        <div class="h-4 bg-surface-3 rounded w-3/4 mb-3"></div>
+        <div class="h-3 bg-surface-3 rounded w-full mb-2"></div>
+        <div class="h-3 bg-surface-3 rounded w-2/3 mb-4"></div>
+        <div class="flex justify-between">
+          <div class="h-3 bg-surface-3 rounded w-16"></div>
+          <div class="h-3 bg-surface-3 rounded w-12"></div>
+        </div>
+      </div>
+    }
+  </div>
+} @else if (!folderStore.selectedFolderId()) {
+  
+  <div class="flex flex-col items-center justify-center h-full text-center">
+    <p class="text-sm text-text-muted mb-2">Selecione uma pasta na sidebar</p>
+    <p class="text-xs text-text-muted">para ver suas notas</p>
+  </div>
+} @else if (noteStore.notesBySelectedFolder().length === 0) {
+  
+  <div class="flex flex-col items-center justify-center h-full text-center">
+    <p class="text-sm text-text-muted mb-2">Nenhuma nota nesta pasta</p>
+    <p class="text-xs text-text-muted">Clique no botão + ao lado do nome da pasta para criar uma nota</p>
+  </div>
+} @else {
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (note of noteStore.notesBySelectedFolder(); track note.id) {
+      <app-note-card [note]="note" />
+    }
+  </div>
+}

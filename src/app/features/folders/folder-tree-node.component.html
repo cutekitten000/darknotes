@@ -1,0 +1,242 @@
+
+<div
+  class="flex items-center min-h-10 md:min-h-8 gap-1 cursor-pointer select-none group relative"
+  [style.paddingLeft.px]="16 + depth() * 16"
+  [class.bg-folder-selected-bg]="isSelected()"
+  [class.text-accent]="isSelected()"
+  [class.font-semibold]="isSelected()"
+  [class.opacity-50]="isDragging()"
+  [class.border-t-2]="dropZone() === 'above'"
+  [class.border-b-2]="dropZone() === 'below'"
+  [class.ring-1]="dropZone() === 'inside'"
+  [class.ring-accent]="dropZone() === 'inside'"
+  [class.bg-accent/5]="dropZone() === 'inside'"
+  [class.border-accent]="dropZone() === 'above' || dropZone() === 'below'"
+  (mouseenter)="isHovered.set(true)"
+  (mouseleave)="isHovered.set(false)"
+  (contextmenu)="onContextMenu($event)"
+  (keydown.enter)="onKeyEnter($event)"
+  (keydown.arrowright)="onKeyArrowToggle($event)"
+  (keydown.arrowleft)="onKeyArrowToggle($event)"
+  role="treeitem"
+  tabindex="0"
+  [attr.aria-selected]="isSelected()"
+  [attr.aria-expanded]="hasChildren() ? isExpanded() : undefined"
+  [attr.aria-level]="depth() + 1"
+  draggable="true"
+  (dragstart)="onFolderDragStart($event)"
+  (dragover)="onFolderDragOver($event)"
+  (dragleave)="onFolderDragLeave()"
+  (drop)="onFolderDrop($event)"
+  (dragend)="onDragEnd()"
+>
+  
+  @if (hasChildren()) {
+    <button
+      (click)="toggleExpand(); $event.stopPropagation()"
+      class="w-4 h-4 flex items-center justify-center text-text-muted hover:text-accent shrink-0 transition-colors"
+      aria-label="Expandir"
+    >
+      <svg
+        lucideChevronRight
+        class="w-3.5 h-3.5 transition-transform duration-150"
+        [class.rotate-90]="isExpanded()"
+      ></svg>
+    </button>
+  } @else {
+    <span class="w-4 shrink-0"></span>
+  }
+
+  
+  <span class="flex items-center justify-center w-4 h-4 shrink-0">
+    @if (isExpanded()) {
+      <svg lucideFolderOpen class="w-4 h-4 text-text-muted"></svg>
+    } @else {
+      <svg lucideFolder class="w-4 h-4 text-text-muted"></svg>
+    }
+  </span>
+
+  
+  @if (isRenaming()) {
+    <input
+      #renameInput
+      [ngModel]="renameValue()"
+      (ngModelChange)="renameValue.set($event)"
+      (keydown.enter)="confirmRename()"
+      (keydown.escape)="cancelRename()"
+      (blur)="confirmRename()"
+      class="flex-1 min-w-0 bg-surface-3 border border-accent rounded-[2px] px-1.5 py-0.5 text-sm text-text outline-none focus:ring-1 focus:ring-accent"
+      aria-label="Novo nome da pasta"
+      autofocus
+    />
+  } @else {
+    
+    <span
+      (click)="onSelect()"
+      (dblclick)="startRename()"
+      class="flex-1 min-w-0 truncate text-sm"
+      [class.text-text]="!isSelected()"
+      [class.text-accent]="isSelected()"
+    >
+      {{ folder().name }}
+    </span>
+
+    
+    @if (noteCount() > 0) {
+      <span
+        class="text-[10px] leading-none text-text-muted bg-surface-2 px-1 py-0.5 rounded shrink-0"
+        title="{{ noteCount() }} nota{{ noteCount() === 1 ? '' : 's' }}"
+      >
+        {{ noteCount() }}
+      </span>
+    }
+  }
+
+  
+  @if (isHovered() && !isRenaming() && !isCreatingSubfolder()) {
+    <button
+      (click)="startCreateNote(); $event.stopPropagation()"
+      class="text-text-muted hover:text-accent p-0.5 shrink-0 transition-colors"
+      aria-label="Criar nota"
+    >
+      <svg lucideFilePlus class="w-3.5 h-3.5"></svg>
+    </button>
+    <button
+      (click)="startCreateSubfolder(); $event.stopPropagation()"
+      class="text-text-muted hover:text-accent p-0.5 shrink-0 transition-colors"
+      aria-label="Criar subpasta"
+    >
+      <svg lucidePlus class="w-3.5 h-3.5"></svg>
+    </button>
+    <button
+      (click)="startRename(); $event.stopPropagation()"
+      class="text-text-muted hover:text-accent p-0.5 shrink-0 transition-colors"
+      aria-label="Renomear pasta"
+    >
+      <svg lucidePencil class="w-3.5 h-3.5"></svg>
+    </button>
+    <button
+      (click)="onDelete(); $event.stopPropagation()"
+      class="text-text-muted hover:text-destructive p-0.5 shrink-0 transition-colors"
+      aria-label="Excluir pasta"
+    >
+      <svg lucideTrash2 class="w-3.5 h-3.5"></svg>
+    </button>
+  }
+</div>
+
+
+@if (isExpanded() && folderNotes().length > 0) {
+  <div role="group" [attr.aria-label]="'Notas em ' + folder().name">
+    @for (note of folderNotes(); track note.id) {
+      <div
+        class="flex items-center min-h-10 md:min-h-8 gap-1 cursor-pointer select-none group/file hover:bg-surface-3 transition-colors relative"
+        [style.paddingLeft.px]="16 + (depth() + 1) * 16"
+        [class.opacity-50]="noteDraggingId() === note.id"
+        [class.border-t-2]="noteDropZone()?.noteId === note.id && noteDropZone()?.position === 'above'"
+        [class.border-b-2]="noteDropZone()?.noteId === note.id && noteDropZone()?.position === 'below'"
+        [class.border-accent]="noteDropZone()?.noteId === note.id"
+        (click)="openNote(note.id)"
+        (contextmenu)="onNoteContextMenu($event, note.id)"
+        (keydown.enter)="onNoteKeyEnter($event, note.id)"
+        role="treeitem"
+        tabindex="0"
+        [attr.aria-level]="depth() + 2"
+        draggable="true"
+        (dragstart)="onNoteDragStart($event, note.id)"
+        (dragover)="onNoteDragOver($event, note.id)"
+        (dragleave)="onNoteDragLeave(note.id)"
+        (drop)="onNoteDrop($event, note.id)"
+        (dragend)="onDragEnd()"
+      >
+        
+        <span class="w-4 shrink-0 flex items-center justify-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14" height="14" viewBox="0 0 24 24"
+            fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"
+            class="text-text-muted"
+          >
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </span>
+
+        
+        <span class="flex-1 min-w-0 truncate text-sm text-text-muted group-hover/file:text-text transition-colors">
+          {{ note.title }}
+        </span>
+      </div>
+    }
+  </div>
+}
+
+
+@if (isExpanded() && children().length > 0) {
+  @for (child of children(); track child.id) {
+    <app-folder-tree-node
+      [folder]="child"
+      [depth]="depth() + 1"
+      [selectedFolderId]="selectedFolderId()"
+      (selectFolder)="selectFolder.emit($event)"
+      (createSubfolder)="createSubfolder.emit($event)"
+      (renameFolder)="renameFolder.emit($event)"
+      (deleteFolder)="deleteFolder.emit($event)"
+    />
+  }
+}
+
+
+@if (isCreatingSubfolder()) {
+  <div
+    class="flex items-center min-h-10 md:min-h-8 gap-1"
+    [style.paddingLeft.px]="16 + (depth() + 1) * 16"
+  >
+    <span class="w-4 shrink-0"></span>
+    <span class="w-4 h-4 flex items-center justify-center shrink-0">
+      <svg lucideFolder class="w-4 h-4 text-accent"></svg>
+    </span>
+    <input
+      #subfolderInput
+      [ngModel]="newSubfolderName()"
+      (ngModelChange)="newSubfolderName.set($event)"
+      (keydown.enter)="confirmCreateSubfolder()"
+      (keydown.escape)="cancelCreateSubfolder()"
+      (blur)="confirmCreateSubfolder()"
+      placeholder="Nome da pasta"
+      aria-label="Nome da nova pasta"
+      class="flex-1 min-w-0 bg-surface-3 border border-accent rounded-[2px] px-1.5 py-0.5 text-sm text-text placeholder:text-text-muted outline-none focus:ring-1 focus:ring-accent"
+      autofocus
+    />
+  </div>
+}
+
+
+<app-create-note-dialog
+  [folderId]="folder().id"
+  [isVisible]="showCreateNoteDialog()"
+  (close)="onCloseCreateDialog()"
+/>
+
+<app-move-note-dialog
+  [isVisible]="showMoveNoteDialog()"
+  (close)="onMoveNoteResult($event)"
+/>
+
+@if (showNoteDeleteConfirm()) {
+  <app-confirm-delete-dialog
+    [folderId]="''"
+    [folderName]="noteStore.notes().find(n => n.id === showNoteDeleteConfirm())?.title ?? ''"
+    [isVisible]="true"
+    [itemType]="'nota'"
+    (confirm)="onNoteDeleteResult(showNoteDeleteConfirm()!, true)"
+    (cancel)="onNoteDeleteResult(showNoteDeleteConfirm()!, false)"
+  />
+}
+
+
+<app-context-menu
+  #folderContextMenu
+  [items]="contextMenuItems()"
+/>

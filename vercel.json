@@ -1,0 +1,8 @@
+{
+  "framework": "angular",
+  "buildCommand": "ng build",
+  "outputDirectory": "dist/darknotes",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

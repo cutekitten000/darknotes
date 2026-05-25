@@ -1,0 +1,66 @@
+@if (isVisible()) {
+  <div
+    class="dialog-backdrop fixed inset-0 z-40 flex items-center justify-center bg-overlay-bg"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="bg-surface-2 rounded-[4px] w-full max-w-[420px] p-6 mx-4"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="create-note-title"
+    >
+      <h2 id="create-note-title" class="text-base font-semibold text-text mb-6">
+        Nova nota
+      </h2>
+
+      
+      <div class="mb-4">
+        <label for="note-title" class="block text-xs text-text-muted mb-1.5">Título</label>
+        <input
+          id="note-title"
+          [ngModel]="title()"
+          (ngModelChange)="title.set($event)"
+          (keydown.enter)="onCreate()"
+          placeholder="Digite o título da nota"
+          class="w-full bg-surface-3 border border-border rounded-[4px] px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+          autofocus
+        />
+      </div>
+
+      
+      <div class="mb-6">
+        <label for="note-tags" class="block text-xs text-text-muted mb-1.5">Tags (opcional)</label>
+        <input
+          id="note-tags"
+          [ngModel]="tags()"
+          (ngModelChange)="tags.set($event)"
+          placeholder="Ex: java, spring, sql"
+          class="w-full bg-surface-3 border border-border rounded-[4px] px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent"
+        />
+        <p class="text-[10px] text-text-muted mt-1">Separe as tags por vírgula ou espaço</p>
+      </div>
+
+      
+      <div class="flex justify-end gap-3">
+        <button
+          (click)="onCancel()"
+          [disabled]="isCreating()"
+          class="px-4 py-2 text-sm font-semibold text-text-muted hover:text-text rounded-[4px] hover:bg-surface-3 transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="onCreate()"
+          [disabled]="isCreating() || !title().trim()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-light active:bg-accent-dark rounded-[4px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          @if (isCreating()) {
+            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          }
+          {{ isCreating() ? 'Criando...' : 'Criar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

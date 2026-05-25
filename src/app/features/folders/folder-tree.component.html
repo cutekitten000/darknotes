@@ -1,0 +1,62 @@
+<div class="py-1" role="tree">
+  
+  @if (store.isLoading()) {
+    <div class="px-4 py-2 space-y-1">
+      <div class="h-8 bg-surface-3 rounded-[4px] animate-pulse"></div>
+      <div class="h-8 bg-surface-3 rounded-[4px] ml-4 animate-pulse"></div>
+      <div class="h-8 bg-surface-3 rounded-[4px] animate-pulse"></div>
+    </div>
+  }
+
+  
+  @if (!store.isLoading() && store.rootFolders().length === 0 && !isCreatingRoot()) {
+    <app-empty-folder-state (createFolder)="onCreateRoot()" />
+  }
+
+  
+  @if (!store.isLoading() && (store.rootFolders().length > 0 || isCreatingRoot())) {
+    
+    @for (folder of store.rootFolders(); track folder.id) {
+      <app-folder-tree-node
+        [folder]="folder"
+        [depth]="0"
+        [selectedFolderId]="store.selectedFolderId()"
+        (selectFolder)="onSelectFolder($event)"
+        (createSubfolder)="onCreateSubfolder($event)"
+        (renameFolder)="onRenameFolder($event.id, $event.name)"
+        (deleteFolder)="onDeleteRequest($event.id, $event.name)"
+      />
+    }
+
+    
+    @if (isCreatingRoot()) {
+      <div class="flex items-center h-8 gap-1 pl-4">
+        <span class="w-4 shrink-0"></span>
+        <span class="w-4 h-4 flex items-center justify-center shrink-0">
+          <svg lucideFolder class="w-4 h-4 text-accent"></svg>
+        </span>
+        <input
+          #rootCreateInput
+          [ngModel]="newRootName()"
+          (ngModelChange)="newRootName.set($event)"
+          (keydown.enter)="confirmCreateRoot()"
+          (keydown.escape)="cancelCreateRoot()"
+          (blur)="confirmCreateRoot()"
+          placeholder="Nome da pasta"
+          aria-label="Nome da nova pasta"
+          class="flex-1 min-w-0 bg-surface-3 border border-accent rounded-[2px] px-1.5 py-0.5 text-sm text-text placeholder:text-text-muted outline-none focus:ring-1 focus:ring-accent"
+          autofocus
+        />
+      </div>
+    }
+  }
+</div>
+
+
+<app-confirm-delete-dialog
+  [folderId]="deleteFolderId() || ''"
+  [folderName]="deleteFolderName()"
+  [isVisible]="showDeleteDialog()"
+  (confirm)="onDeleteConfirm($event)"
+  (cancel)="onDeleteCancel()"
+/>

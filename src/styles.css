@@ -1,0 +1,99 @@
+@import "tailwindcss";
+@import "prismjs/themes/prism-tomorrow.css";
+@import "prismjs/plugins/line-numbers/prism-line-numbers.css";
+
+@theme {
+  --color-surface: #1a1a1a;
+  --color-surface-2: #252525;
+  --color-surface-3: #333333;
+  --color-accent: #b16286;
+  --color-accent-light: #c47a9e;
+  --color-accent-dark: #9a4d6e;
+  --color-text: #e0e0e0;
+  --color-text-muted: #888888;
+  --color-border: #333333;
+  --color-border-focus: #b16286;
+  --color-destructive: #e74c3c;
+  --color-success: #27ae60;
+  --color-text-on-accent: #ffffff;
+  --color-toast-error-bg: #3a1a1a;
+  /* Phase 2 tokens — toast variants */
+  --color-toast-success-bg: #1a2e1a;
+  --color-toast-success-border: #27ae60;
+  --color-toast-info-bg: #1a1a2e;
+  --color-toast-info-border: #4a9eff;
+  /* Phase 2 tokens — folder tree */
+  --color-folder-hover: #2d2d2d;
+  --color-folder-selected-bg: #2a2a2a;
+  --color-overlay-bg: rgba(0, 0, 0, 0.6);
+  --font-family-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --text-display: 28px;
+  --text-display--line-height: 1.2;
+}
+
+/* Prism.js overrides — flat industrial code blocks */
+pre[class*="language-"] {
+  background: #1e1e1e !important;
+  border: 1px solid #333 !important;
+  border-radius: 4px;
+  margin: 1rem 0 !important;
+  font-size: 0.875rem;
+}
+
+code[class*="language-"] {
+  font-size: 0.875rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* Line numbers styling */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid #333;
+}
+
+.line-numbers .line-numbers-rows > span:before {
+  color: #666;
+}
+
+/* Inline code */
+p > code,
+li > code {
+  background: #252525;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+  border: 1px solid #333;
+  font-size: 0.8125rem;
+  color: #e0e0e0;
+}
+
+/* Markdown preview styling */
+.markdown-preview h1 { font-size: 1.25rem; font-weight: 600; color: #e0e0e0; margin: 1rem 0 0.5rem; }
+.markdown-preview h2 { font-size: 1.125rem; font-weight: 600; color: #e0e0e0; margin: 0.875rem 0 0.375rem; }
+.markdown-preview h3 { font-size: 1rem; font-weight: 600; color: #e0e0e0; margin: 0.75rem 0 0.25rem; }
+.markdown-preview p { margin: 0.5rem 0; line-height: 1.6; color: #cccccc; }
+.markdown-preview a { color: #b16286; text-decoration: underline; }
+.markdown-preview a:hover { color: #c47a9e; }
+.markdown-preview blockquote {
+  border-left: 3px solid #b16286;
+  padding-left: 1rem;
+  color: #888;
+  margin: 0.75rem 0;
+}
+.markdown-preview ul, .markdown-preview ol { padding-left: 1.5rem; margin: 0.5rem 0; }
+.markdown-preview li { margin: 0.25rem 0; color: #cccccc; }
+.markdown-preview img { max-width: 100%; border-radius: 4px; margin: 1rem 0; }
+.markdown-preview table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.markdown-preview th, .markdown-preview td { border: 1px solid #333; padding: 0.5rem 0.75rem; text-align: left; }
+.markdown-preview th { background: #252525; color: #e0e0e0; font-weight: 600; }
+.markdown-preview td { color: #cccccc; }
+.markdown-preview pre { margin: 0.75rem 0; }
+.markdown-preview code { font-size: 0.8125rem; }
+.markdown-preview input[type="checkbox"] { margin-right: 0.5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+}

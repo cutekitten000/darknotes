@@ -1,0 +1,73 @@
+<div class="relative group">
+  <button
+    (click)="openEditor()"
+    (contextmenu)="onContextMenu($event)"
+    class="w-full text-left bg-surface-2 border border-border rounded-[4px] p-4 hover:bg-surface-3 transition-colors cursor-pointer"
+  >
+    
+    <h3 class="text-sm font-semibold text-text truncate mb-1.5 group-hover:text-accent transition-colors">
+      {{ note().title }}
+    </h3>
+
+    
+    <p class="text-xs text-text-muted line-clamp-2 mb-3 leading-relaxed">
+      {{ getPreview(note().content) }}
+    </p>
+
+    
+    <div class="flex items-center justify-between gap-2">
+      
+      <div class="flex items-center gap-1.5 flex-wrap">
+        @for (tag of formatTags(note().languageTags); track tag) {
+          <span class="text-[10px] px-1.5 py-0.5 rounded-[2px] bg-surface-3 text-text-muted font-mono">
+            {{ tag }}
+          </span>
+        }
+        @if (note().languageTags.length === 0) {
+          <span class="text-[10px] text-text-muted">Sem tag</span>
+        }
+      </div>
+
+      
+      <span class="text-[10px] text-text-muted shrink-0">
+        {{ formatDate(note().updatedAt) }}
+      </span>
+    </div>
+  </button>
+
+  
+  <button
+    (click)="requestDelete($event)"
+    class="absolute top-2 right-2 p-1.5 rounded-[4px] bg-surface-3 border border-border text-text-muted hover:text-destructive hover:border-destructive opacity-0 group-hover:opacity-100 transition-all duration-150"
+    title="Excluir nota"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14" height="14" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round"
+    >
+      <path d="M3 6h18"></path>
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+    </svg>
+  </button>
+
+  
+  @if (showDeleteConfirm()) {
+    <app-confirm-delete-dialog
+      [folderId]="''"
+      [folderName]="note().title"
+      [isVisible]="true"
+      [itemType]="'nota'"
+      (confirm)="onDeleteResult(true)"
+      (cancel)="onDeleteResult(false)"
+    />
+  }
+
+  
+  <app-context-menu
+    #contextMenu
+    [items]="menuItems"
+  />
+</div>

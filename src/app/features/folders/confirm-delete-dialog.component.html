@@ -1,0 +1,60 @@
+@if (isVisible()) {
+  <div
+    class="dialog-backdrop fixed inset-0 z-40 flex items-center justify-center bg-overlay-bg"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="bg-surface-2 rounded-[4px] w-full max-w-[400px] p-6 mx-4"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="delete-dialog-title"
+    >
+      <h2 id="delete-dialog-title" class="text-base font-semibold text-text mb-4">
+        {{ itemType() === 'pasta' ? 'Excluir pasta?' : 'Excluir nota?' }}
+      </h2>
+      <div class="space-y-2 mb-6">
+        <p class="text-sm text-text">
+          Tem certeza que deseja excluir {{ itemType() === 'pasta' ? 'a pasta' : 'a nota' }}
+          <strong class="text-accent">"{{ folderName() }}"</strong>?
+        </p>
+        @if (itemType() === 'pasta' && (subfolderCount() > 0 || noteCount() > 0)) {
+          <p class="text-sm text-text-muted">
+            @if (subfolderCount() > 0 && noteCount() > 0) {
+              {{ subfolderCount() }} subpasta{{ subfolderCount() > 1 ? 's' : '' }}
+              e {{ noteCount() }} nota{{ noteCount() > 1 ? 's' : '' }}
+              serão movidos para a lixeira.
+            } @else if (subfolderCount() > 0) {
+              {{ subfolderCount() }} subpasta{{ subfolderCount() > 1 ? 's' : '' }}
+              será(ão) movida(s) para a lixeira.
+            } @else {
+              {{ noteCount() }} nota{{ noteCount() > 1 ? 's' : '' }}
+              será(ão) movida(s) para a lixeira.
+            }
+          </p>
+        }
+        <p class="text-xs text-text-muted">Esta ação não pode ser desfeita.</p>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button
+          (click)="onCancel()"
+          [disabled]="isDeleting()"
+          class="px-4 py-2 text-sm font-semibold text-text-muted hover:text-text rounded-[4px] hover:bg-surface-3 transition-colors disabled:opacity-50"
+        >
+          Cancelar
+        </button>
+        <button
+          #confirmBtn
+          (click)="onConfirm()"
+          [disabled]="isDeleting()"
+          class="px-4 py-2 text-sm font-semibold text-white bg-accent hover:bg-accent-light active:bg-accent-dark rounded-[4px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          @if (isDeleting()) {
+            <span class="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+          }
+          {{ isDeleting() ? 'Excluindo...' : 'Excluir' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
